@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { Users } from 'lucide-react';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const SOCKET_URL = import.meta.env.VITE_API_URL || 'https://woh-shaamein-production.up.railway.app';
 
 function App() {
   const [onlineUsers, setOnlineUsers] = useState(0);

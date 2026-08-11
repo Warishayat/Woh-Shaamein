@@ -17,7 +17,8 @@ export const AudioProvider = ({ children }) => {
 
   const fetchSongs = async (isBackground = false) => {
     try {
-      const response = await axios.get('http://localhost:3000/api/songs');
+const API_URL = import.meta.env.VITE_API_URL || 'https://woh-shaamein-production.up.railway.app';
+      const response = await axios.get(`${API_URL}/api/songs`);
       if (response.data.success) {
         setSongs((prevSongs) => {
           if (prevSongs.length !== response.data.songs.length || (prevSongs[0] && prevSongs[0]._id !== response.data.songs[0]._id)) {

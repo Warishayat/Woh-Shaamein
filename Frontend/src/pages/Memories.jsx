@@ -46,7 +46,8 @@ const Memories = () => {
       }
 
       // Update URL to match your backend port if different. Usually 3000 or 5000.
-      const response = await axios.post('http://localhost:3000/api/songs', formDataToSend, {
+      const API_URL = import.meta.env.VITE_API_URL || 'https://woh-shaamein-production.up.railway.app';
+      const response = await axios.post(`${API_URL}/api/songs`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
