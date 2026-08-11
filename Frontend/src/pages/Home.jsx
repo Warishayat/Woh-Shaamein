@@ -14,7 +14,8 @@ const Home = () => {
     togglePlay, 
     nextSong, 
     prevSong, 
-    selectSong 
+    selectSong,
+    seekTo
   } = useAudio();
   
   const [showPlaylist, setShowPlaylist] = useState(false);
@@ -33,6 +34,10 @@ const Home = () => {
 
   // Force Cloudinary to serve file as MP3 to ensure browser compatibility
   const optimizedAudioUrl = song?.audio?.url?.replace('/upload/', '/upload/f_mp3/');
+  
+  // Optimize Images for fast loading
+  const optimizedImageUrl = song?.image?.url?.replace('/upload/', '/upload/f_auto,q_auto,w_1920/');
+  const optimizedPlaylistImageUrl = (url) => url?.replace('/upload/', '/upload/w_100,f_auto,q_auto/');
 
   return (
     <div className="relative w-full h-screen overflow-hidden flex flex-col items-center justify-center pt-20">
@@ -51,7 +56,7 @@ const Home = () => {
             key={song._id}
             className="fixed inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out scale-105 -z-20"
             style={{ 
-              backgroundImage: `url(${song.image?.url})`,
+              backgroundImage: `url(${optimizedImageUrl || song.image?.url})`,
               filter: 'brightness(0.5) sepia(0.3)'
             }}
           />
@@ -67,7 +72,7 @@ const Home = () => {
               {song.year}
             </div>
 
-            <h1 className="font-nostalgic text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-1 md:mb-2 text-white text-shadow tracking-wide leading-tight line-clamp-1">
+            <h1 className="font-nostalgic text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-1 md:mb-2 text-white text-shadow tracking-wide leading-normal py-2">
               {song.title}
             </h1>
             <div className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-300 font-light tracking-wide italic mb-1 md:mb-2 animate-fade-in">
@@ -84,8 +89,8 @@ const Home = () => {
               <div className="text-[10px] sm:text-xs md:text-sm text-nostalgia-gold/70 tracking-widest uppercase mb-2 md:mb-4 border-b border-white/10 pb-1 md:pb-2 self-start">
                 {song.submittedBy && song.submittedBy.toLowerCase() !== 'anonymous' ? `${song.submittedBy}'s Story` : 'A Memory Shared'}
               </div>
-              <div className="overflow-y-auto custom-scrollbar max-h-24 sm:max-h-28 md:max-h-36 lg:max-h-48 pr-2">
-                <p className="font-light tracking-wide text-xs sm:text-sm md:text-lg lg:text-xl leading-relaxed md:leading-loose text-gray-100">
+              <div className="w-full">
+                <p className="font-light tracking-wide text-[10px] sm:text-xs md:text-sm lg:text-base leading-normal md:leading-relaxed text-gray-100 line-clamp-4 md:line-clamp-6 lg:line-clamp-8">
                   "{song.story}"
                 </p>
               </div>
@@ -109,12 +114,19 @@ const Home = () => {
                 <SkipForward size={18} strokeWidth={1.5} />
               </button>
 
-              {/* Progress Bar Row - Seeking Disabled */}
+              {/* Progress Bar Row */}
               <div className="flex-1 flex items-center space-x-2 md:space-x-3">
                 <span className="text-[10px] md:text-xs text-gray-400 font-light w-8 text-right">{formatTime((progress / 100) * duration)}</span>
-                <div className="h-1 flex-1 bg-white/20 rounded-full overflow-hidden">
+                <div 
+                  className="h-2 flex-1 bg-white/20 rounded-full overflow-hidden cursor-pointer flex items-center relative"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const percent = ((e.clientX - rect.left) / rect.width) * 100;
+                    seekTo(percent);
+                  }}
+                >
                   <div 
-                    className="h-full bg-nostalgia-gold shadow-[0_0_10px_rgba(212,175,55,0.7)] rounded-full transition-all duration-100 pointer-events-none"
+                    className="h-full bg-nostalgia-gold shadow-[0_0_10px_rgba(212,175,55,0.7)] rounded-full transition-all duration-100 pointer-events-none absolute top-0 left-0"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -148,7 +160,7 @@ const Home = () => {
                           s._id === currentSongId ? 'bg-nostalgia-gold/10' : 'hover:bg-white/5'
                         }`}
                       >
-                        <img src={s.image?.url} alt={s.title} className="w-10 h-10 rounded object-cover mr-3 shadow-md" />
+                        <img src={optimizedPlaylistImageUrl(s.image?.url) || s.image?.url} alt={s.title} className="w-10 h-10 rounded object-cover mr-3 shadow-md" loading="lazy" />
                         <div className="flex-1 min-w-0 text-left">
                           <h4 className={`text-sm font-medium truncate ${s._id === currentSongId ? 'text-nostalgia-gold' : 'text-gray-200'}`}>
                             {s.title}

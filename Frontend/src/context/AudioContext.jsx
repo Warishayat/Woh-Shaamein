@@ -106,6 +106,13 @@ export const AudioProvider = ({ children }) => {
     if (!isPlaying) setIsPlaying(true);
   };
 
+  const seekTo = (percent) => {
+    if (!audioRef.current) return;
+    const dur = audioRef.current.duration || 0;
+    audioRef.current.currentTime = (percent / 100) * dur;
+    setProgress(percent);
+  };
+
   return (
     <AudioContext.Provider value={{
       songs,
@@ -118,7 +125,8 @@ export const AudioProvider = ({ children }) => {
       togglePlay,
       nextSong,
       prevSong,
-      selectSong
+      selectSong,
+      seekTo
     }}>
       {/* Hidden Global Audio Tag */}
       {song && (
